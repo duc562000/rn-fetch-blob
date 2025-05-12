@@ -12,6 +12,7 @@
 #import "RNFetchBlobConst.h"
 #import "RNFetchBlobReqBuilder.h"
 
+#import "IOS7Polyfill.h"
 #import <CommonCrypto/CommonDigest.h>
 
 
@@ -160,9 +161,8 @@ typedef NS_ENUM(NSUInteger, ResponseFormat) {
         respFile = NO;
     }
 
-    NSURLSessionDataTask *task = [session dataTaskWithRequest:req];
-    [task resume];
-    self.task = task;
+    self.task = [session dataTaskWithRequest:req];
+    [self.task resume];
 
     // network status indicator
     if ([[options objectForKey:CONFIG_INDICATOR] boolValue]) {
@@ -214,20 +214,20 @@ typedef NS_ENUM(NSUInteger, ResponseFormat) {
 
             return;
         } else {
-            self.isServerPush = [[respCType lowercaseString] containsString:@"multipart/x-mixed-replace;"];
+            self.isServerPush = [[respCType lowercaseString] RNFBContainsString:@"multipart/x-mixed-replace;"];
         }
 
         if(respCType)
         {
             NSArray * extraBlobCTypes = [options objectForKey:CONFIG_EXTRA_BLOB_CTYPE];
 
-            if ([respCType containsString:@"text/"]) {
+            if ([respCType RNFBContainsString:@"text/"]) {
                 respType = @"text";
-            } else if ([respCType containsString:@"application/json"]) {
+            } else if ([respCType RNFBContainsString:@"application/json"]) {
                 respType = @"json";
             } else if(extraBlobCTypes) { // If extra blob content type is not empty, check if response type matches
                 for (NSString * substr in extraBlobCTypes) {
-                    if ([respCType containsString:[substr lowercaseString]]) {
+                    if ([respCType RNFBContainsString:[substr lowercaseString]]) {
                         respType = @"blob";
                         respFile = YES;
                         destPath = [RNFetchBlobFS getTempPath:taskId withExtension:nil];
@@ -285,7 +285,7 @@ typedef NS_ENUM(NSUInteger, ResponseFormat) {
 
             // if not set overwrite in options, defaults to TRUE
             BOOL overwrite = [options valueForKey:@"overwrite"] == nil ? YES : [[options valueForKey:@"overwrite"] boolValue];
-            BOOL appendToExistingFile = [destPath containsString:@"?append=true"];
+            BOOL appendToExistingFile = [destPath RNFBContainsString:@"?append=true"];
 
             appendToExistingFile = !overwrite;
 

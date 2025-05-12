@@ -8,6 +8,7 @@ import android.os.Build;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.content.ContentUris;
+import android.os.Environment;
 import android.content.ContentResolver;
 import com.RNFetchBlob.RNFetchBlobUtils;
 import java.io.File;
@@ -29,7 +30,7 @@ public class PathResolver {
                 final String type = split[0];
 
                 if ("primary".equalsIgnoreCase(type)) {
-                    return context.getExternalFilesDir(null) + "/" + split[1];
+                    return Environment.getExternalStorageDirectory() + "/" + split[1];
                 }
 
                 // TODO handle non-primary volumes

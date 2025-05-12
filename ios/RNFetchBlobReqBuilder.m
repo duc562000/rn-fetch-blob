@@ -11,6 +11,7 @@
 #import "RNFetchBlobNetwork.h"
 #import "RNFetchBlobConst.h"
 #import "RNFetchBlobFS.h"
+#import "IOS7Polyfill.h"
 
 #if __has_include(<React/RCTAssert.h>)
 #import <React/RCTLog.h>
@@ -116,7 +117,7 @@
                     orgPath = [RNFetchBlobFS getPathOfAsset:orgPath];
                     if([orgPath hasPrefix:AL_PREFIX])
                     {
-
+                        
                         [RNFetchBlobFS readFile:orgPath encoding:nil onComplete:^(id content, NSString* code, NSString * err) {
                             if(err != nil)
                             {
@@ -130,7 +131,7 @@
                                 onComplete(request, [((NSData *)content) length]);
                             }
                         }];
-
+                        
                         return;
                     }
                     size = [[[NSFileManager defaultManager] attributesOfItemAtPath:orgPath error:nil] fileSize];
@@ -149,7 +150,7 @@
 
                     __block NSString * cType = [[self class]getHeaderIgnoreCases:@"content-type" fromHeaders:mheaders];
                     // when content-type is application/octet* decode body string using BASE64 decoder
-                    if([[cType lowercaseString] hasPrefix:@"application/octet"] || [[cType lowercaseString] containsString:@";base64"])
+                    if([[cType lowercaseString] hasPrefix:@"application/octet"] || [[cType lowercaseString] RNFBContainsString:@";base64"])
                     {
                         __block NSString * ncType = [[cType stringByReplacingOccurrencesOfString:@";base64" withString:@""]stringByReplacingOccurrencesOfString:@";BASE64" withString:@""];
                         if([mheaders valueForKey:@"content-type"] != nil)
